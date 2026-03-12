@@ -15,17 +15,9 @@
 - :notes: Background music toggle
 
 ## :camera: Screenshots
-Place screenshots in `img/` and update the links below:
 
-- `img/app-main.png`
-- `img/terminal-prompt.png`
-
-Example:
-
-```
 ![Main Window](img/app-main.png)
-![Embedded Terminal](img/terminal-prompt.png)
-```
+![Instruction](img/instruction.png)
 
 ## :rocket: Quick Start (Windows)
 1. Install OpenSSH Client (Windows optional feature).
@@ -66,17 +58,9 @@ The EXE will appear in `dist/SSHKeyForge.exe`.
 - :notes: Muzyka w tle
 
 ## :camera: Zrzuty ekranu
-Umieść screeny w `img/` i podmień linki poniżej:
 
-- `img/app-main.png`
-- `img/terminal-prompt.png`
-
-Przykład:
-
-```
-![Okno główne](img/app-main.png)
-![Terminal w aplikacji](img/terminal-prompt.png)
-```
+![Okno główne](img/app-main_pl.png)
+![Instrukcja](img/instrukcja.png)
 
 ## :rocket: Szybki start (Windows)
 1. Zainstaluj OpenSSH Client (opcjonalna funkcja Windows).
