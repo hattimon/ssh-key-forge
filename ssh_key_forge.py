@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import sys
 import os
 import subprocess
@@ -141,7 +141,7 @@ TRANSLATIONS = {
         "host_login_pass_required": "Provide host, login and SSH password.",
         "auth_required": "Select auth method and fill required fields.",
         "pub_missing": "Public key not found. Generate the key first.",
-        "paramiko_missing": "Missing paramiko. Install: pip install paramiko (EXE build is missing it)."
+        "paramiko_missing": "Missing paramiko. Install: pip install paramiko",
         "pub_empty": "Public key file is empty.",
         "upload_ok": "Key uploaded to remote device.",
         "upload_exists": "Key already present in authorized_keys.",
@@ -149,8 +149,6 @@ TRANSLATIONS = {
         "music_missing": "bg.mp3 not found next to the app. Music disabled.",
         "music_disabled": "QtMultimedia missing. Music disabled.",
         "agent_added": "Key added to Windows ssh-agent.",
-        "remote_shell_opened": "Remote terminal opened in app.",
-        "remote_shell_closed": "Remote terminal closed.",
         "agent_prompt": "Opened a console to enter key passphrase for ssh-agent.",
         "agent_missing": "ssh-add not found in PATH. Install OpenSSH Client.",
         "agent_err": "ssh-add error: {err}",
@@ -244,7 +242,7 @@ TRANSLATIONS = {
         "host_login_pass_required": "Podaj host, login i haslo SSH.",
         "auth_required": "Wybierz metode logowania i wypelnij pola.",
         "pub_missing": "Nie znaleziono klucza publicznego. Najpierw wygeneruj klucz.",
-        "paramiko_missing": "Brak biblioteki paramiko. Zainstaluj: pip install paramiko (brak w buildzie EXE)."
+        "paramiko_missing": "Brak biblioteki paramiko. Zainstaluj: pip install paramiko",
         "pub_empty": "Plik klucza publicznego jest pusty.",
         "upload_ok": "Klucz zostal wgrany na urzadzenie.",
         "upload_exists": "Klucz juz znajduje sie w authorized_keys.",
@@ -252,8 +250,6 @@ TRANSLATIONS = {
         "music_missing": "Brak pliku bg.mp3 obok programu. Muzyka wylaczona.",
         "music_disabled": "Brak QtMultimedia. Muzyka wylaczona.",
         "agent_added": "Klucz dodany do agenta Windows.",
-        "remote_shell_opened": "Terminal zdalny otwarty w aplikacji.",
-        "remote_shell_closed": "Terminal zdalny zamkniety.",
         "agent_prompt": "Otworzono konsole do wpisania hasla klucza dla ssh-agent.",
         "agent_missing": "Brak ssh-add w PATH. Zainstaluj OpenSSH Client.",
         "agent_err": "Blad ssh-add: {err}",
@@ -885,11 +881,6 @@ class MainWindow(QWidget):
         self._awaiting_agent_passphrase = False
         self._pending_agent_path = None
         self._askpass_path = None
-        self._remote_client = None
-        self._remote_channel = None
-        self._remote_timer = QTimer(self)
-        self._remote_timer.setInterval(100)
-        self._remote_timer.timeout.connect(self._poll_remote_shell)
 
         self.load_settings()
         self.apply_styles()
@@ -1342,17 +1333,6 @@ class MainWindow(QWidget):
             self._start_ssh_add(key_path, passphrase)
             return
 
-        if self._remote_channel and (not self.proc or self.proc.state() != QProcess.ProcessState.Running):
-            if not text_raw.strip():
-                return
-            self.terminal_input.clear()
-            self._append_terminal(f"> {text_raw}")
-            try:
-                self._remote_channel.send((text_raw + "\n").encode("utf-8"))
-            except Exception as exc:
-                self.set_status(self.tr("ssh_error", err=exc), ERROR)
-            return
-
         text = text_raw.strip()
         if not text:
             return
@@ -1446,40 +1426,6 @@ class MainWindow(QWidget):
             self._append_terminal(data)
             self._maybe_auto_yes(data)
             self._maybe_focus_terminal(data)
-
-    def _poll_remote_shell(self):
-        if not self._remote_channel:
-            return
-        try:
-            if self._remote_channel.recv_ready():
-                data = self._remote_channel.recv(4096)
-                if data:
-                    text = data.decode("utf-8", errors="replace")
-                    self._append_terminal(text)
-            if self._remote_channel.closed or self._remote_channel.exit_status_ready():
-                self._remote_timer.stop()
-                try:
-                    self._remote_channel.close()
-                except Exception:
-                    pass
-                try:
-                    if self._remote_client:
-                        self._remote_client.close()
-                except Exception:
-                    pass
-                self._remote_channel = None
-                self._remote_client = None
-                self.set_status(self.tr("remote_shell_closed"), MUTED)
-        except Exception as exc:
-            self._remote_timer.stop()
-            self._remote_channel = None
-            if self._remote_client:
-                try:
-                    self._remote_client.close()
-                except Exception:
-                    pass
-            self._remote_client = None
-            self.set_status(self.tr("ssh_error", err=exc), ERROR)
 
     def _on_process_error(self, error):
         if self.proc_purpose == "keygen":
@@ -1694,7 +1640,7 @@ class MainWindow(QWidget):
                 if not password:
                     self.set_status(self.tr("auth_required"), ERROR)
                     return None
-                client.connect(hostname=host, port=self.port.value(), username=user, password=password, timeout=8, allow_agent=False, look_for_keys=False)
+                client.connect(hostname=host, port=self.port.value(), username=user, password=password, timeout=8)
                 return client
 
             if method in ("key", "key_pass"):
@@ -1776,46 +1722,30 @@ class MainWindow(QWidget):
             self.set_status(self.tr("ssh_error", err=exc), ERROR)
 
     def open_remote_terminal(self):
-        if self.proc and self.proc.state() == QProcess.ProcessState.Running:
-            self.set_status(self.tr("process_running"), MUTED)
-            return
-        if self._remote_channel:
-            try:
-                self._remote_channel.close()
-            except Exception:
-                pass
-            self._remote_channel = None
-        if self._remote_client:
-            try:
-                self._remote_client.close()
-            except Exception:
-                pass
-            self._remote_client = None
-
         host = self.host.text().strip()
         user = self.username.text().strip()
         if not host or not user:
             self.set_status(self.tr("host_login_pass_required"), ERROR)
             return
 
-        client = self.connect_client()
-        if not client:
-            return
+        method = self.auth_method.currentData()
+        key_path = self.auth_key_path.text().strip()
+        port = self.port.value()
 
+        parts = ["ssh", f"{user}@{host}", "-p", str(port)]
+        if method in ("key", "key_pass"):
+            if not key_path:
+                self.set_status(self.tr("auth_required"), ERROR)
+                return
+            parts.extend(["-i", key_path])
+
+        cmd = " ".join([f'"{p}"' if (" " in p or ":" in p) else p for p in parts])
         try:
-            channel = client.invoke_shell()
-            self._remote_client = client
-            self._remote_channel = channel
-            self._remote_timer.start()
-            self._append_terminal(f"$ ssh {user}@{host}")
-            self.set_status(self.tr("remote_shell_opened"), SUCCESS)
-            self.terminal_input.setFocus()
-            self.terminal_input.selectAll()
+            if os.name == "nt":
+                subprocess.Popen(["cmd", "/c", "start", "", "cmd", "/k", cmd])
+            else:
+                subprocess.Popen(["x-terminal-emulator", "-e", cmd])
         except Exception as exc:
-            try:
-                client.close()
-            except Exception:
-                pass
             self.set_status(self.tr("ssh_error", err=exc), ERROR)
 
     def detect_remote_keys(self):
@@ -2059,7 +1989,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
