@@ -54,6 +54,7 @@ jobs:
         run: |
           if (-not (Test-Path dist\SSHKeyForge.exe)) { throw "Portable EXE missing." }
           if (-not (Test-Path dist\SSHKeyForge-Setup.exe)) { throw "Installer EXE missing." }
+          Get-ChildItem dist | Format-Table Name,Length
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -62,6 +63,7 @@ jobs:
             dist/SSHKeyForge.exe
             dist/SSHKeyForge-Setup.exe
           body_path: RELEASE_NOTES.md
+          fail_on_unmatched_files: true
           name: SSH Key Forge ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
