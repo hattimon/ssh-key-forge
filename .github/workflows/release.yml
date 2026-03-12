@@ -1,4 +1,4 @@
-name: Build and Release
+﻿name: Build and Release
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller --noconfirm --clean SSHKeyForge.spec
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." ssh_key_forge.py
 
       - name: Install NSIS
         run: |
