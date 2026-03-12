@@ -36,8 +36,24 @@ jobs:
           choco install nsis -y
 
       - name: Build Installer
+        shell: pwsh
         run: |
-          & "C:\Program Files (x86)\NSIS\makensis.exe" installer\SSHKeyForge.nsi
+          $candidates = @(
+            "C:\Program Files (x86)\NSIS\makensis.exe",
+            "C:\Program Files\NSIS\makensis.exe",
+            "$env:ProgramFiles\NSIS\makensis.exe",
+            "$env:ProgramFiles(x86)\NSIS\makensis.exe"
+          )
+          $makensis = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $makensis) { throw "NSIS (makensis.exe) not found." }
+          & $makensis installer\SSHKeyForge.nsi
+          if (-not (Test-Path dist\SSHKeyForge-Setup.exe)) { throw "Installer not created." }
+
+      - name: Verify artifacts
+        shell: pwsh
+        run: |
+          if (-not (Test-Path dist\SSHKeyForge.exe)) { throw "Portable EXE missing." }
+          if (-not (Test-Path dist\SSHKeyForge-Setup.exe)) { throw "Installer EXE missing." }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -49,6 +65,3 @@ jobs:
           name: SSH Key Forge ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
