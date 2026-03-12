@@ -1733,12 +1733,40 @@ class MainWindow(QWidget):
         port = self.port.value()
 
         parts = ["ssh", f"{user}@{host}", "-p", str(port)]
-        if method in ("key", "key_pass"):
+        if method == "password":
+            parts.extend(
+                [
+                    "-o",
+                    "PreferredAuthentications=password",
+                    "-o",
+                    "PubkeyAuthentication=no",
+                    "-o",
+                    "IdentitiesOnly=yes",
+                ]
+            )
+        elif method in ("key", "key_pass"):
             if not key_path:
                 self.set_status(self.tr("auth_required"), ERROR)
                 return
-            parts.extend(["-i", key_path])
-
+            parts.extend(
+                [
+                    "-i",
+                    key_path,
+                    "-o",
+                    "IdentitiesOnly=yes",
+                    "-o",
+                    "PreferredAuthentications=publickey",
+                ]
+            )
+        elif method == "agent":
+            parts.extend(
+                [
+                    "-o",
+                    "IdentitiesOnly=yes",
+                    "-o",
+                    "PreferredAuthentications=publickey",
+                ]
+            )
         cmd = " ".join([f'"{p}"' if (" " in p or ":" in p) else p for p in parts])
         try:
             if os.name == "nt":
