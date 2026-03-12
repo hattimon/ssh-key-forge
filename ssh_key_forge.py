@@ -141,7 +141,7 @@ TRANSLATIONS = {
         "host_login_pass_required": "Provide host, login and SSH password.",
         "auth_required": "Select auth method and fill required fields.",
         "pub_missing": "Public key not found. Generate the key first.",
-        "paramiko_missing": "Missing paramiko. Install: pip install paramiko",
+        "paramiko_missing": "Missing paramiko. Install: pip install paramiko (EXE build is missing it)."
         "pub_empty": "Public key file is empty.",
         "upload_ok": "Key uploaded to remote device.",
         "upload_exists": "Key already present in authorized_keys.",
@@ -244,7 +244,7 @@ TRANSLATIONS = {
         "host_login_pass_required": "Podaj host, login i haslo SSH.",
         "auth_required": "Wybierz metode logowania i wypelnij pola.",
         "pub_missing": "Nie znaleziono klucza publicznego. Najpierw wygeneruj klucz.",
-        "paramiko_missing": "Brak biblioteki paramiko. Zainstaluj: pip install paramiko",
+        "paramiko_missing": "Brak biblioteki paramiko. Zainstaluj: pip install paramiko (brak w buildzie EXE)."
         "pub_empty": "Plik klucza publicznego jest pusty.",
         "upload_ok": "Klucz zostal wgrany na urzadzenie.",
         "upload_exists": "Klucz juz znajduje sie w authorized_keys.",
