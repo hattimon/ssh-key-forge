@@ -1,11 +1,11 @@
-!define PRODUCT_NAME "SSH Key Forge"
+﻿!define PRODUCT_NAME "SSH Key Forge"
 !define PRODUCT_EXE "SSHKeyForge.exe"
 !define PRODUCT_PUBLISHER "Kosmo"
-!define PRODUCT_VERSION "1.0.0"
+!define PRODUCT_VERSION "1.0.1"
 !define INSTALL_DIR "$PROGRAMFILES\\SSH Key Forge"
 
 Name "${PRODUCT_NAME}"
-OutFile "dist\\SSHKeyForge-Setup.exe"
+OutFile "..\\dist\\SSHKeyForge-Setup.exe"
 InstallDir "${INSTALL_DIR}"
 InstallDirRegKey HKCU "Software\\${PRODUCT_NAME}" "InstallDir"
 RequestExecutionLevel admin
@@ -25,8 +25,8 @@ RequestExecutionLevel admin
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
-  File "dist\\SSHKeyForge.exe"
-  File "icon.ico"
+  File "..\\dist\\SSHKeyForge.exe"
+  File "..\\icon.ico"
   WriteRegStr HKCU "Software\\${PRODUCT_NAME}" "InstallDir" "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\\${PRODUCT_NAME}"
   CreateShortcut "$SMPROGRAMS\\${PRODUCT_NAME}\\${PRODUCT_NAME}.lnk" "$INSTDIR\\${PRODUCT_EXE}" "" "$INSTDIR\\icon.ico"
@@ -44,3 +44,6 @@ Section "Uninstall"
   RMDir "$INSTDIR"
   DeleteRegKey HKCU "Software\\${PRODUCT_NAME}"
 SectionEnd
+
+
+

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import sys
 import os
 import subprocess
@@ -170,6 +170,18 @@ TRANSLATIONS = {
         "agent_passphrase_prompt": "Enter the key passphrase in the input below and press Send (leave empty for none).",
         "agent_passphrase_status": "Passphrase required to add the key to ssh-agent.",
         "agent_passphrase_submitted": "> [passphrase submitted]",
+        "section_agent_keys": "Agent keys (duplicate keys can cause connection issues)",
+        "refresh_agent_keys": "Refresh agent keys",
+        "remove_agent_keys": "Remove selected",
+        "clear_agent_keys": "Clear agent",
+        "agent_keys_loaded": "Agent keys loaded: {count}",
+        "agent_keys_empty": "No keys in ssh-agent.",
+        "agent_keys_failed": "Failed to list ssh-agent keys.",
+        "agent_keys_removed": "Selected agent keys removed.",
+        "agent_keys_none": "No agent keys selected.",
+        "agent_keys_cleared": "All agent keys removed.",
+        "agent_keys_remove_failed": "Failed to remove key: {err}",
+        "agent_keys_clear_failed": "Failed to clear ssh-agent: {err}",
     },
     "PL": {
         "app_title": "SSH Key Forge",
@@ -207,7 +219,7 @@ TRANSLATIONS = {
         "music_toggle": "Muzyka w tle",
         "instruction_btn": "Instrukcja",
         "instruction_title": "Instrukcja generowania klucza SSH",
-        "instruction_body": "<b>Krok po kroku (generowanie klucza)</b><br><ul><li>Wybierz typ klucza (zalecany ED25519). Dla RSA ustaw dlugosc klucza.</li><li>Opcjonalnie ustaw komentarz i haslo (passphrase), aby zabezpieczyc klucz prywatny.</li><li>Wybierz sciezke zapisu i kliknij Generuj klucz; w razie potrzeby potwierdz nadpisanie.</li><li>Gdy pojawiaja sie pytania (haslo lub nadpisanie), uzyj wbudowanego terminala; Auto-yes moze odpowiadac na pytania y/n.</li><li>Po wygenerowaniu mozesz automatycznie dodac klucz do ssh-agent, zaznaczajac Auto-dodaj klucz do agenta.</li></ul><br><b>Znaczenie plikow</b><br><ul><li><b>id_ed25519.pub</b> to klucz publiczny, ktory wgrywasz na zdalny komputer (authorized_keys).</li><li><b>id_ed25519</b> (bez rozszerzenia) to klucz prywatny przechowywany lokalnie do autoryzacji polaczenia. Nie udostepniaj go.</li></ul><b>Wszystkie funkcje aplikacji</b><br><ul><li><b>Generowanie kluczy</b> ED25519, RSA, ECDSA i sprzetowych, z komentarzem i haslem.</li><li><b>Auto-dodanie do ssh-agent (Windows)</b> laduje nowy klucz do agenta, dzieki czemu mozesz laczyc sie bez wpisywania hasla za kazdym razem; umozliwia logowanie przez agenta.</li><li><b>Reczne dodanie do ssh-agent (Windows)</b> pozwala zaladowac dowolny istniejacy klucz prywatny.</li><li><b>Instalacja/Wlaczenie ssh-agent (Windows)</b> oraz <b>Wylaczenie ssh-agent</b> zarzadzaja usluga agenta.</li><li><b>Polaczenie zdalne</b> obsluguje logowanie haslem, kluczem, kluczem + haslem oraz przez ssh-agent.</li><li><b>Wgranie klucza</b> dopisuje klucz publiczny do authorized_keys na zdalnym hoscie.</li><li><b>Klucze zdalne</b>: wykrywanie, usuwanie zaznaczonych, lub zamiana na lokalny klucz.</li><li><b>Otworz terminal zdalny</b> uruchamia sesje SSH z wybrana metoda logowania.</li><li><b>Wbudowany terminal</b> obsluguje pytania ssh-keygen/ssh-add bez opuszczania aplikacji.</li><li><b>Zmiana jezyka</b> i <b>muzyka w tle</b>.</li></ul>",
+        "instruction_body": "<b>Krok po kroku (generowanie klucza)</b><br><ul><li>Wybierz typ klucza (zalecany ED25519). Dla RSA ustaw dlugosc klucza.</li><li>Opcjonalnie ustaw komentarz i haslo (passphrase), aby zabezpieczyc klucz prywatny.</li><li>Wybierz sciezke zapisu i kliknij Generuj klucz; w razie potrzeby potwierdz nadpisanie.</li><li>Gdy pojawiaja sie pytania (haslo lub nadpisanie), uzyj wbudowanego terminala;<br>Auto-yes moze odpowiadac na pytania y/n.</li><li>Po wygenerowaniu mozesz automatycznie dodac klucz do ssh-agent, zaznaczajac Auto-dodaj klucz do agenta.</li></ul><br><b>Znaczenie plikow</b><br><ul><li><b>id_ed25519.pub</b> to klucz publiczny, ktory wgrywasz na zdalny komputer (authorized_keys).</li><li><b>id_ed25519</b> (bez rozszerzenia) to klucz prywatny przechowywany lokalnie do autoryzacji polaczenia. Nie udostepniaj go.</li></ul><b>Wszystkie funkcje aplikacji</b><br><ul><li><b>Generowanie kluczy</b> ED25519, RSA, ECDSA i sprzetowych, z komentarzem i haslem.</li><li><b>Auto-dodanie do ssh-agent (Windows)</b> laduje nowy klucz do agenta, dzieki czemu mozesz laczyc sie bez wpisywania hasla za kazdym razem; umozliwia logowanie przez agenta.</li><li><b>Reczne dodanie do ssh-agent (Windows)</b> pozwala zaladowac dowolny istniejacy klucz prywatny.</li><li><b>Instalacja/Wlaczenie ssh-agent (Windows)</b> oraz <b>Wylaczenie ssh-agent</b> zarzadzaja usluga agenta.</li><li><b>Polaczenie zdalne</b> obsluguje logowanie haslem, kluczem, kluczem + haslem oraz przez ssh-agent.</li><li><b>Wgranie klucza</b> dopisuje klucz publiczny do authorized_keys na zdalnym hoscie.</li><li><b>Klucze zdalne</b>: wykrywanie, usuwanie zaznaczonych, lub zamiana na lokalny klucz.</li><li><b>Otworz terminal zdalny</b> uruchamia sesje SSH z wybrana metoda logowania.</li><li><b>Wbudowany terminal</b> obsluguje pytania ssh-keygen/ssh-add bez opuszczania aplikacji.</li><li><b>Zmiana jezyka</b> i <b>muzyka w tle</b>.</li></ul>",
         "auto_add_agent": "Auto-dodaj klucz do agenta",
         "auto_add_agent_note": "(Windows zapamieta klucz)",
         "agent_toggle": "Dodaj klucz do ssh-agent (Windows)",
@@ -271,6 +283,18 @@ TRANSLATIONS = {
         "agent_passphrase_prompt": "Wpisz haslo do klucza w polu ponizej i kliknij Wyslij (puste = brak hasla).",
         "agent_passphrase_status": "Wymagane haslo do dodania klucza do ssh-agent.",
         "agent_passphrase_submitted": "> [haslo wyslane]",
+        "section_agent_keys": "Klucze w agencie (duplikacja kluczy moze powodowac problemy z polaczeniem)",
+        "refresh_agent_keys": "Odswiez klucze agenta",
+        "remove_agent_keys": "Usun zaznaczone",
+        "clear_agent_keys": "Wyczysc agenta",
+        "agent_keys_loaded": "Zaladowano klucze agenta: {count}",
+        "agent_keys_empty": "Brak kluczy w ssh-agent.",
+        "agent_keys_failed": "Nie udalo sie odczytac kluczy ssh-agent.",
+        "agent_keys_removed": "Usunieto zaznaczone klucze agenta.",
+        "agent_keys_none": "Brak zaznaczonych kluczy agenta.",
+        "agent_keys_cleared": "Wyczyszczono wszystkie klucze agenta.",
+        "agent_keys_remove_failed": "Nie udalo sie usunac klucza: {err}",
+        "agent_keys_clear_failed": "Nie udalo sie wyczyscic ssh-agent: {err}",
     },
 }
 
@@ -350,7 +374,7 @@ def short_key_label(line: str) -> str:
     suffix = parts[1][-10:] if len(parts) > 1 else ""
     label = f"{key_type} {comment}".strip()
     if suffix:
-        label = f"{label} …{suffix}".strip()
+        label = f"{label} â€¦{suffix}".strip()
     return label
 
 
@@ -371,7 +395,7 @@ class TitleBar(QWidget):
         layout.addWidget(self.title, 1)
 
         self.btn_min = QPushButton("-")
-        self.btn_max = QPushButton("□")
+        self.btn_max = QPushButton("▢")
         self.btn_close = QPushButton("x")
 
         self.btn_min.setObjectName("title_min")
@@ -745,6 +769,19 @@ class MainWindow(QWidget):
         self.btn_enable_agent.clicked.connect(self.enable_ssh_agent)
         self.btn_disable_agent.clicked.connect(self.disable_ssh_agent)
 
+        self.agent_keys_list = QListWidget()
+        self.agent_keys_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.agent_keys_list.setFixedHeight(120)
+        self.btn_refresh_agent_keys = QPushButton()
+        self.btn_refresh_agent_keys.setObjectName("actionButton")
+        self.btn_remove_agent_keys = QPushButton()
+        self.btn_remove_agent_keys.setObjectName("actionButton")
+        self.btn_clear_agent_keys = QPushButton()
+        self.btn_clear_agent_keys.setObjectName("actionButton")
+        self.btn_refresh_agent_keys.clicked.connect(self.refresh_agent_keys)
+        self.btn_remove_agent_keys.clicked.connect(self.remove_agent_keys)
+        self.btn_clear_agent_keys.clicked.connect(self.clear_agent_keys)
+
         self.remote_keys_list = QListWidget()
         self.remote_keys_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.remote_keys_list.setFixedHeight(120)
@@ -766,6 +803,7 @@ class MainWindow(QWidget):
 
         self.section_gen = self._section_label("")
         self.section_agent = self._section_label("")
+        self.section_agent_keys = self._section_label("")
         self.section_upload = self._section_label("")
         self.section_remote = self._section_label("")
 
@@ -809,6 +847,9 @@ class MainWindow(QWidget):
             self.btn_add_agent,
             self.btn_enable_agent,
             self.btn_disable_agent,
+            self.btn_refresh_agent_keys,
+            self.btn_remove_agent_keys,
+            self.btn_clear_agent_keys,
             self.btn_detect_remote,
             self.btn_remove_remote,
             self.btn_replace_remote,
@@ -849,6 +890,10 @@ class MainWindow(QWidget):
         content_layout.addWidget(self.section_agent)
         content_layout.addLayout(self._row_agent_key_path())
         content_layout.addLayout(self._row_three_buttons(self.btn_add_agent, self.btn_enable_agent, self.btn_disable_agent))
+
+        content_layout.addWidget(self.section_agent_keys)
+        content_layout.addWidget(self.agent_keys_list)
+        content_layout.addLayout(self._row_three_buttons(self.btn_refresh_agent_keys, self.btn_remove_agent_keys, self.btn_clear_agent_keys))
 
         content_layout.addWidget(self.section_upload)
         content_layout.addLayout(self._row_label(self.lbl_auth_method, self.auth_method))
@@ -941,6 +986,7 @@ class MainWindow(QWidget):
 
         self.section_gen.setText(self.tr("section_gen"))
         self.section_agent.setText(self.tr("section_agent"))
+        self.section_agent_keys.setText(self.tr("section_agent_keys"))
         self.section_upload.setText(self.tr("section_upload"))
         self.section_remote.setText(self.tr("section_remote_keys"))
 
@@ -982,6 +1028,10 @@ class MainWindow(QWidget):
         self.btn_add_agent.setText(self.tr("add_selected_agent"))
         self.btn_enable_agent.setText(self.tr("enable_agent"))
         self.btn_disable_agent.setText(self.tr("disable_agent"))
+
+        self.btn_refresh_agent_keys.setText(self.tr("refresh_agent_keys"))
+        self.btn_remove_agent_keys.setText(self.tr("remove_agent_keys"))
+        self.btn_clear_agent_keys.setText(self.tr("clear_agent_keys"))
 
         self.btn_detect_remote.setText(self.tr("detect_remote"))
         self.btn_remove_remote.setText(self.tr("remove_remote"))
@@ -1567,6 +1617,88 @@ class MainWindow(QWidget):
         self._pending_agent_path = None
         self._start_ssh_add(str(path_obj), passphrase)
 
+    def _run_ssh_add(self, args: list):
+        try:
+            cmd = ["ssh-add"] + args
+            kwargs = {"capture_output": True, "text": True}
+            if os.name == "nt":
+                kwargs["creationflags"] = 0x08000000
+            result = subprocess.run(cmd, **kwargs)
+            output = (result.stdout or "") + (result.stderr or "")
+            return result.returncode, output.strip()
+        except FileNotFoundError:
+            self.set_status(self.tr("agent_missing"), ERROR)
+            return 1, self.tr("agent_missing")
+        except Exception as exc:
+            return 1, str(exc)
+
+    def refresh_agent_keys(self):
+        if os.name != "nt":
+            self.set_status(self.tr("agent_windows_only"), MUTED)
+            return
+        code, output = self._run_ssh_add(["-L"])
+        self.agent_keys_list.clear()
+        if code != 0:
+            if "no identities" in output.lower():
+                self.set_status(self.tr("agent_keys_empty"), MUTED)
+                return
+            self.set_status(self.tr("agent_keys_failed"), ERROR)
+            return
+        lines = [ln.strip() for ln in output.splitlines() if ln.strip()]
+        if not lines or any("no identities" in ln.lower() for ln in lines):
+            self.set_status(self.tr("agent_keys_empty"), MUTED)
+            return
+        for line in lines:
+            if "no identities" in line.lower():
+                continue
+            item = QListWidgetItem(short_key_label(line))
+            item.setData(Qt.ItemDataRole.UserRole, line)
+            self.agent_keys_list.addItem(item)
+        if self.agent_keys_list.count() == 0:
+            self.set_status(self.tr("agent_keys_empty"), MUTED)
+        else:
+            self.set_status(self.tr("agent_keys_loaded", count=self.agent_keys_list.count()), SUCCESS)
+
+    def remove_agent_keys(self):
+        if os.name != "nt":
+            self.set_status(self.tr("agent_windows_only"), MUTED)
+            return
+        selected = [item.data(Qt.ItemDataRole.UserRole) for item in self.agent_keys_list.selectedItems()]
+        if not selected:
+            self.set_status(self.tr("agent_keys_none"), MUTED)
+            return
+        errors = []
+        for idx, line in enumerate(selected):
+            tmp_path = Path(tempfile.gettempdir()) / f"ssh_key_forge_agent_{idx}.pub"
+            try:
+                tmp_path.write_text(line + "\n", encoding="utf-8")
+            except Exception as exc:
+                errors.append(str(exc))
+                continue
+            code, output = self._run_ssh_add(["-d", str(tmp_path)])
+            try:
+                tmp_path.unlink()
+            except Exception:
+                pass
+            if code != 0 and "no identities" not in output.lower():
+                errors.append(output or str(code))
+        if errors:
+            self.set_status(self.tr("agent_keys_remove_failed", err=errors[0]), ERROR)
+        else:
+            self.set_status(self.tr("agent_keys_removed"), SUCCESS)
+        self.refresh_agent_keys()
+
+    def clear_agent_keys(self):
+        if os.name != "nt":
+            self.set_status(self.tr("agent_windows_only"), MUTED)
+            return
+        code, output = self._run_ssh_add(["-D"])
+        if code != 0 and "no identities" not in output.lower():
+            self.set_status(self.tr("agent_keys_clear_failed", err=output or code), ERROR)
+        else:
+            self.set_status(self.tr("agent_keys_cleared"), SUCCESS)
+        self.refresh_agent_keys()
+
     def enable_ssh_agent(self):
         if os.name != "nt":
             self.set_status(self.tr("agent_windows_only"), MUTED)
@@ -1967,13 +2099,13 @@ class MainWindow(QWidget):
             self.setFixedSize(MAX_SIZE, MAX_SIZE)
             self._is_maximized = True
             self._drag_active = False
-            self.titlebar.btn_max.setText("❐")
+            self.titlebar.btn_max.setText("▣")
             self.titlebar.set_maximize_tooltip(self.tr("restore"))
         else:
             self.setFixedSize(self._base_size, self._base_size)
             self._is_maximized = False
             self._drag_active = False
-            self.titlebar.btn_max.setText("□")
+            self.titlebar.btn_max.setText("▢")
             self.titlebar.set_maximize_tooltip(self.tr("maximize"))
 
 
@@ -1989,6 +2121,17 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -56,12 +56,22 @@ jobs:
           if (-not (Test-Path dist\SSHKeyForge-Setup.exe)) { throw "Installer EXE missing." }
           Get-ChildItem dist | Format-Table Name,Length
 
+      - name: Package ZIP
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart("v")
+          $zip = "dist\SSHKeyForge_v${ver}_win64.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path dist\SSHKeyForge.exe -DestinationPath $zip
+          if (-not (Test-Path $zip)) { throw "ZIP not created." }
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/SSHKeyForge.exe
             dist/SSHKeyForge-Setup.exe
+            dist/SSHKeyForge_v*_win64.zip
           body_path: RELEASE_NOTES.md
           fail_on_unmatched_files: true
           name: SSH Key Forge ${{ github.ref_name }}
