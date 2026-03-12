@@ -1,10 +1,13 @@
-﻿name: Build and Release
+name: Build and Release
 
 on:
   workflow_dispatch:
   push:
     tags:
       - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build-release:
