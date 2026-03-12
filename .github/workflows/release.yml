@@ -1,4 +1,4 @@
-name: Build and Release
+﻿name: Build and Release
 
 on:
   workflow_dispatch:
@@ -31,11 +31,20 @@ jobs:
         run: |
           python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." ssh_key_forge.py
 
+      - name: Install NSIS
+        run: |
+          choco install nsis -y
+
+      - name: Build Installer
+        run: |
+          & "C:\Program Files (x86)\NSIS\makensis.exe" installer\SSHKeyForge.nsi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/SSHKeyForge.exe
+            dist/SSHKeyForge-Setup.exe
           body_path: RELEASE_NOTES.md
           name: SSH Key Forge ${{ github.ref_name }}
         env:
