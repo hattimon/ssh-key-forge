@@ -1,6 +1,7 @@
 ﻿# SSH Key Forge
 
-🪟 [Download Windows EXE (v1.0.0)](https://github.com/hattimon/ssh-key-forge/releases/tag/v1.0.0)
+### Download Latest Version
+[![Windows EXE](https://img.shields.io/badge/Windows-EXE-blue)](https://github.com/hattimon/ssh-key-forge/releases/latest)
 
 
 [Polski](#polski)
