@@ -29,7 +29,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." --hidden-import paramiko --hidden-import paramiko.transport --hidden-import paramiko.auth_handler --hidden-import paramiko.ssh_exception ssh_key_forge.py
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." --collect-all paramiko --collect-submodules paramiko --collect-all cryptography --collect-all bcrypt --collect-all nacl ssh_key_forge.py
 
       - name: Install NSIS
         run: |
@@ -49,4 +49,5 @@ jobs:
           name: SSH Key Forge ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
