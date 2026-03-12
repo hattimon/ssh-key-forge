@@ -1,5 +1,8 @@
 ﻿# SSH Key Forge
 
+🪟 [Download Windows EXE (v1.0.0)](https://github.com/hattimon/ssh-key-forge/releases/tag/v1.0.0)
+
+
 [Polski](#polski)
 
 **SSH Key Forge** is a sleek PyQt6 desktop app for generating SSH keys, adding them to the Windows ssh-agent, and managing remote authorized keys — all with an embedded terminal for prompts and confirmations.
