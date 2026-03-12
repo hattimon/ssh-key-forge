@@ -1,4 +1,4 @@
-﻿name: Build and Release
+name: Build and Release
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
 
       - name: Build EXE
         run: |
-          python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." ssh_key_forge.py
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name SSHKeyForge --icon icon.ico --add-data "bg.mp3;." --hidden-import paramiko --hidden-import paramiko.transport --hidden-import paramiko.auth_handler --hidden-import paramiko.ssh_exception ssh_key_forge.py
 
       - name: Install NSIS
         run: |
@@ -49,3 +49,4 @@ jobs:
           name: SSH Key Forge ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
