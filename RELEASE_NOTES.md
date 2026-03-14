@@ -1,6 +1,12 @@
 ﻿# Release Notes
 
 ## English
+Version v1.1.1 includes:
+- White titlebar icons (min/max/restore) with proper minimize line
+- Instruction dialog height tuned (no scrollbar, less empty space)
+- Remote key replace now uses the selected .pub below
+- Removed redundant local-key upload button
+
 Version v1.0.1 includes:
 - New ssh-agent key management section (list, remove selected, clear agent)
 - Agent keys label warning about duplicates causing connection issues
@@ -15,6 +21,12 @@ Version v1.0.0 includes:
 - Updated README with screenshots
 
 ## Polski
+Wersja v1.1.1 zawiera:
+- Biale ikony min/max/przywracania w pasku tytulu (minimalizacja jako linia)
+- Okno instrukcji dopasowane: bez scrolla i bez nadmiaru pustego miejsca
+- Zamiana kluczy zdalnych korzysta z wybranego nizej pliku .pub
+- Usuniety zbedny przycisk wgrywania lokalnego klucza
+
 Wersja v1.0.1 zawiera:
 - Nowa sekcja zarzadzania kluczami w ssh-agent (lista, usun zaznaczone, wyczysc agenta)
 - Ostrzezenie przy kluczach agenta o duplikatach powodujacych problemy z polaczeniem
@@ -27,3 +39,4 @@ Wersja v1.0.0 zawiera:
 - Zarzadzanie authorized_keys na zdalnym hoscie (wykrywanie, usuwanie, zamiana)
 - Interfejs po angielsku i po polsku
 - Zaktualizowany README ze screenami
+
