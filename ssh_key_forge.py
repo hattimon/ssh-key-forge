@@ -245,7 +245,7 @@ TRANSLATIONS = {
         "no_process": "Brak aktywnego procesu.",
         "detect_remote": "Wykryj klucze zdalne",
         "remove_remote": "Usun zaznaczone",
-        "replace_remote": "Zamien wybrany nizej *.pub",
+        "replace_remote": "Zamien na wybrany nizej *.pub",
         "upload_selected_pub_btn": "Wgraj wybrany klucz publiczny",
         "browse_pub_key": "Wybierz klucz lokalny *.pub",
         "pub_key_path_placeholder": "Sciezka do klucza publicznego (*.pub)",
