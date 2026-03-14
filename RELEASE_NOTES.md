@@ -2,9 +2,12 @@
 
 ## English
 Version v1.1.1 includes:
+- Instruction content expanded and clarified
+- More descriptive, intuitive button labels
+- Added upload of selected local .pub key to remote device
+- Remote key replacement now uses the selected .pub below
 - White titlebar icons (min/max/restore) with proper minimize line
 - Instruction dialog height tuned (no scrollbar, less empty space)
-- Remote key replace now uses the selected .pub below
 - Removed redundant local-key upload button
 
 Version v1.0.1 includes:
@@ -22,9 +25,12 @@ Version v1.0.0 includes:
 
 ## Polski
 Wersja v1.1.1 zawiera:
+- Uzupelniona i doprecyzowana instrukcja
+- Bardziej opisowe i intuicyjne etykiety przyciskow
+- Dodana mozliwosc wgrania wybranego lokalnego klucza .pub na urzadzenie zdalne
+- Zamiana kluczy zdalnych korzysta z wybranego nizej pliku .pub
 - Biale ikony min/max/przywracania w pasku tytulu (minimalizacja jako linia)
 - Okno instrukcji dopasowane: bez scrolla i bez nadmiaru pustego miejsca
-- Zamiana kluczy zdalnych korzysta z wybranego nizej pliku .pub
 - Usuniety zbedny przycisk wgrywania lokalnego klucza
 
 Wersja v1.0.1 zawiera:
@@ -39,4 +45,6 @@ Wersja v1.0.0 zawiera:
 - Zarzadzanie authorized_keys na zdalnym hoscie (wykrywanie, usuwanie, zamiana)
 - Interfejs po angielsku i po polsku
 - Zaktualizowany README ze screenami
+
+
 
