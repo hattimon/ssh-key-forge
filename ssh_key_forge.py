@@ -6,8 +6,8 @@ import math
 import tempfile
 from pathlib import Path
 
-from PyQt6.QtCore import Qt, QRect, QUrl, QRectF, QSettings, QProcess, QProcessEnvironment, QTimer
-from PyQt6.QtGui import QColor, QPainter, QLinearGradient, QPen, QFont, QPainterPath
+from PyQt6.QtCore import Qt, QRect, QUrl, QRectF, QSettings, QProcess, QProcessEnvironment, QTimer, QSize
+from PyQt6.QtGui import QColor, QPainter, QLinearGradient, QPen, QFont, QPainterPath, QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
@@ -78,7 +78,7 @@ TRANSLATIONS = {
         "enable_agent": "Enable ssh-agent",
         "disable_agent": "Disable ssh-agent",
         "section_upload": "Remote connection",
-        "section_remote_keys": "Remote keys",
+        "section_remote_keys": "Keys on remote device",
         "language_label": "Language",
         "key_type_label": "Key type",
         "key_bits_label": "Key length (RSA)",
@@ -102,11 +102,11 @@ TRANSLATIONS = {
         "auth_key_passphrase": "Private key + passphrase",
         "auth_agent": "SSH agent",
         "generate_btn": "Generate key",
-        "upload_btn": "Upload key",
+        "upload_btn": "Upload generated public key from save path",
         "music_toggle": "Background music",
         "instruction_btn": "Instruction",
         "instruction_title": "How to generate SSH keys",
-        "instruction_body": "<b>Step-by-step (key generation)</b><br><ul><li>Choose a key type (recommended: ED25519). For RSA, select the key length.</li><li>Optionally set a comment and a passphrase to protect the private key.</li><li>Choose the save path and click Generate key; confirm overwrite if asked.</li><li>If prompts appear (passphrase or overwrite), use the embedded terminal input; Auto-yes can answer y/n prompts.</li><li>After generation, you can automatically add the key to ssh-agent by checking Auto-add generated key to agent.</li></ul><br><b>What the files mean</b><br><ul><li><b>id_ed25519.pub</b> is the public key that you upload to the remote computer (authorized_keys).</li><li><b>id_ed25519</b> (no extension) is the private key kept on your computer for authentication. Never share it.</li></ul><br><b>All application features</b><br><ul><li><b>Key generation</b> for ED25519, RSA, ECDSA, and hardware-backed keys, with optional comment and passphrase.</li><li><b>Auto-add to ssh-agent (Windows)</b> loads the new key into the agent so you can connect without typing the passphrase every time; it enables agent-based logins.</li><li><b>Manual add to ssh-agent (Windows)</b> lets you load any existing private key.</li><li><b>Install/Enable ssh-agent (Windows)</b> and <b>Disable ssh-agent</b> manage the agent service.</li><li><b>Remote connection</b> supports password, private key, private key + passphrase, or ssh-agent authentication.</li><li><b>Upload key</b> appends the public key to authorized_keys on the remote host.</li><li><b>Remote keys</b>: detect keys, remove selected, or replace with the local public key.</li><li><b>Open remote terminal</b> launches an SSH session with the selected auth method.</li><li><b>Embedded terminal</b> handles ssh-keygen/ssh-add prompts directly inside the app.</li><li><b>Language switch</b> and <b>background music</b> toggle.</li></ul>",
+        "instruction_body": "<b>Step-by-step (key generation)</b><br><ul><li>Choose a key type (recommended: ED25519). For RSA, select the key length.</li><li>Optionally set a comment and a passphrase to protect the private key.</li><li>Choose the save path and click Generate key;<br>confirm overwrite if asked.</li><li>If prompts appear (passphrase or overwrite), use the embedded terminal input;<br>Auto-yes can answer y/n prompts.</li><li>To upload the generated key, click<br><b>Upload generated public key from save path</b>.<br>The uploaded key is the public key from that save path.</li></ul><br><b>What the files mean</b><br><ul><li><b>id_ed25519.pub</b> is the public key that you upload to the remote computer (authorized_keys).</li><li><b>id_ed25519</b> (no extension) is the private key kept on your computer for authentication. Never share it.</li></ul><br><b>All application features</b><br><ul><li><b>Key generation</b> for ED25519, RSA, ECDSA, and hardware-backed keys, with optional comment and passphrase.</li><li><b>SSH-agent management (Windows)</b>: list keys, remove selected,<br>or clear all with <b>Clear agent</b>.</li><li><b>Upload generated public key</b> uses the public key from the save path.</li><li><b>Upload selected public key</b> lets you add any .pub file to the remote device.</li><li><b>Auto-add to ssh-agent (Windows)</b> loads the new key into the agent so you can connect without typing the passphrase every time;<br>it enables agent-based logins.</li><li><b>Manual add to ssh-agent (Windows)</b> lets you load any existing private key.</li><li><b>Install/Enable ssh-agent (Windows)</b> and <b>Disable ssh-agent</b> manage the agent service.</li><li><b>Remote connection</b> supports password, private key, private key + passphrase, or ssh-agent authentication.</li><li><b>Upload generated key</b> appends the public key to authorized_keys on the remote host.</li><li><b>Remote keys</b>: detect keys, remove selected, or replace with the selected .pub below.</li><li><b>Open remote terminal</b> launches an SSH session with the selected auth method.</li><li><b>Embedded terminal</b> handles ssh-keygen/ssh-add prompts directly inside the app.</li><li><b>Language switch</b> and <b>background music</b> toggle.</li></ul>",
         "auto_add_agent": "Auto-add generated key to agent",
         "auto_add_agent_note": "(Windows will remember it)",
         "agent_toggle": "Add key to ssh-agent (Windows)",
@@ -124,7 +124,10 @@ TRANSLATIONS = {
         "no_process": "No active process.",
         "detect_remote": "Detect remote keys",
         "remove_remote": "Remove selected",
-        "replace_remote": "Replace with local key",
+        "replace_remote": "Replace with selected *.pub below",
+        "upload_selected_pub_btn": "Upload selected public key",
+        "browse_pub_key": "Select local *.pub key",
+        "pub_key_path_placeholder": "Path to public key (*.pub)",
         "status_ready": "Ready",
         "minimize": "Minimize",
         "maximize": "Maximize",
@@ -159,11 +162,16 @@ TRANSLATIONS = {
         "agent_none_selected": "Select at least one local key.",
         "remote_keys_loaded": "Remote keys loaded: {count}",
         "remote_keys_removed": "Selected remote keys removed.",
-        "remote_keys_replaced": "Remote keys replaced with local key.",
+        "remote_keys_replaced": "Remote keys replaced with selected .pub.",
         "remote_keys_none": "No remote keys selected.",
         "remote_keys_empty": "No keys on remote device.",
+        "pub_select_missing": "Select a public key file (*.pub).",
+        "pub_select_empty": "Selected public key file is empty.",
+        "pub_select_uploaded": "Selected public key uploaded to remote device.",
+        "pub_select_exists": "Selected public key already present in authorized_keys.",
         "file_dialog_title": "Save key",
         "file_dialog_key": "Select private key",
+        "file_dialog_pub": "Select public key",
         "agent_key_passphrase_label": "Agent key passphrase",
         "agent_key_passphrase_placeholder": "Passphrase for key added to agent",
         "agent_key_passphrase_required": "Key requires passphrase, enter it before adding.",
@@ -191,7 +199,7 @@ TRANSLATIONS = {
         "enable_agent": "Wlacz ssh-agent",
         "disable_agent": "Wylacz ssh-agent",
         "section_upload": "Polaczenie zdalne",
-        "section_remote_keys": "Klucze na zdalnym",
+        "section_remote_keys": "Klucze na urzadzeniu zdalnym",
         "language_label": "Jezyk",
         "key_type_label": "Typ klucza",
         "key_bits_label": "Dlugosc klucza (RSA)",
@@ -215,11 +223,11 @@ TRANSLATIONS = {
         "auth_key_passphrase": "Klucz + haslo",
         "auth_agent": "SSH agent",
         "generate_btn": "Generuj klucz",
-        "upload_btn": "Wgraj klucz",
+        "upload_btn": "Wgraj wygenerowany klucz publiczny okreslony w sciezce zapisu",
         "music_toggle": "Muzyka w tle",
         "instruction_btn": "Instrukcja",
         "instruction_title": "Instrukcja generowania klucza SSH",
-        "instruction_body": "<b>Krok po kroku (generowanie klucza)</b><br><ul><li>Wybierz typ klucza (zalecany ED25519). Dla RSA ustaw dlugosc klucza.</li><li>Opcjonalnie ustaw komentarz i haslo (passphrase), aby zabezpieczyc klucz prywatny.</li><li>Wybierz sciezke zapisu i kliknij Generuj klucz; w razie potrzeby potwierdz nadpisanie.</li><li>Gdy pojawiaja sie pytania (haslo lub nadpisanie), uzyj wbudowanego terminala;<br>Auto-yes moze odpowiadac na pytania y/n.</li><li>Po wygenerowaniu mozesz automatycznie dodac klucz do ssh-agent, zaznaczajac Auto-dodaj klucz do agenta.</li></ul><br><b>Znaczenie plikow</b><br><ul><li><b>id_ed25519.pub</b> to klucz publiczny, ktory wgrywasz na zdalny komputer (authorized_keys).</li><li><b>id_ed25519</b> (bez rozszerzenia) to klucz prywatny przechowywany lokalnie do autoryzacji polaczenia. Nie udostepniaj go.</li></ul><b>Wszystkie funkcje aplikacji</b><br><ul><li><b>Generowanie kluczy</b> ED25519, RSA, ECDSA i sprzetowych, z komentarzem i haslem.</li><li><b>Auto-dodanie do ssh-agent (Windows)</b> laduje nowy klucz do agenta, dzieki czemu mozesz laczyc sie bez wpisywania hasla za kazdym razem; umozliwia logowanie przez agenta.</li><li><b>Reczne dodanie do ssh-agent (Windows)</b> pozwala zaladowac dowolny istniejacy klucz prywatny.</li><li><b>Instalacja/Wlaczenie ssh-agent (Windows)</b> oraz <b>Wylaczenie ssh-agent</b> zarzadzaja usluga agenta.</li><li><b>Polaczenie zdalne</b> obsluguje logowanie haslem, kluczem, kluczem + haslem oraz przez ssh-agent.</li><li><b>Wgranie klucza</b> dopisuje klucz publiczny do authorized_keys na zdalnym hoscie.</li><li><b>Klucze zdalne</b>: wykrywanie, usuwanie zaznaczonych, lub zamiana na lokalny klucz.</li><li><b>Otworz terminal zdalny</b> uruchamia sesje SSH z wybrana metoda logowania.</li><li><b>Wbudowany terminal</b> obsluguje pytania ssh-keygen/ssh-add bez opuszczania aplikacji.</li><li><b>Zmiana jezyka</b> i <b>muzyka w tle</b>.</li></ul>",
+        "instruction_body": "<b>Krok po kroku (generowanie klucza)</b><br><ul><li>Wybierz typ klucza (zalecany ED25519). Dla RSA ustaw dlugosc klucza.</li><li>Opcjonalnie ustaw komentarz i haslo (passphrase), aby zabezpieczyc klucz prywatny.</li><li>Wybierz sciezke zapisu i kliknij Generuj klucz;<br>w razie potrzeby potwierdz nadpisanie.</li><li>Gdy pojawiaja sie pytania (haslo lub nadpisanie), uzyj wbudowanego terminala;<br>Auto-yes moze odpowiadac na pytania y/n.</li><li>Aby wgrac wygenerowany klucz, kliknij<br><b>Wgraj wygenerowany klucz publiczny okreslony w sciezce zapisu</b>.<br>Wgrywany jest klucz publiczny z tej sciezki.</li></ul><br><b>Znaczenie plikow</b><br><ul><li><b>id_ed25519.pub</b> to klucz publiczny, ktory wgrywasz na zdalny komputer (authorized_keys).</li><li><b>id_ed25519</b> (bez rozszerzenia) to klucz prywatny przechowywany lokalnie do autoryzacji polaczenia. Nie udostepniaj go.</li></ul><br><b>Wszystkie funkcje aplikacji</b><br><ul><li><b>Generowanie kluczy</b> ED25519, RSA, ECDSA i sprzetowych, z komentarzem i haslem.</li><li><b>Zarzadzanie ssh-agent (Windows)</b>: lista kluczy, usuwanie zaznaczonych,<br>oraz usuniecie wszystkich przez <b>Wyczysc agenta</b>.</li><li><b>Wgraj wygenerowany klucz publiczny</b> uzywa klucza z sciezki zapisu.</li><li><b>Wgraj wybrany klucz publiczny</b> pozwala dodac dowolny plik .pub do urzadzenia zdalnego.</li><li><b>Auto-dodanie do ssh-agent (Windows)</b> laduje nowy klucz do agenta,<br>dzieki czemu mozesz laczyc sie bez wpisywania hasla za kazdym razem; umozliwia logowanie przez agenta.</li><li><b>Reczne dodanie do ssh-agent (Windows)</b> pozwala zaladowac dowolny istniejacy klucz prywatny.</li><li><b>Instalacja/Wlaczenie ssh-agent (Windows)</b> oraz <b>Wylaczenie ssh-agent</b> zarzadzaja usluga agenta.</li><li><b>Polaczenie zdalne</b> obsluguje logowanie haslem, kluczem, kluczem + haslem oraz przez ssh-agent.</li><li><b>Wgranie klucza</b> dopisuje klucz publiczny do authorized_keys na zdalnym hoscie.</li><li><b>Klucze zdalne</b>: wykrywanie, usuwanie zaznaczonych, lub zamiana na wybrany nizej plik .pub.</li><li><b>Otworz terminal zdalny</b> uruchamia sesje SSH z wybrana metoda logowania.</li><li><b>Wbudowany terminal</b> obsluguje pytania ssh-keygen/ssh-add bez opuszczania aplikacji.</li><li><b>Zmiana jezyka</b> i <b>muzyka w tle</b>.</li></ul>",
         "auto_add_agent": "Auto-dodaj klucz do agenta",
         "auto_add_agent_note": "(Windows zapamieta klucz)",
         "agent_toggle": "Dodaj klucz do ssh-agent (Windows)",
@@ -237,7 +245,10 @@ TRANSLATIONS = {
         "no_process": "Brak aktywnego procesu.",
         "detect_remote": "Wykryj klucze zdalne",
         "remove_remote": "Usun zaznaczone",
-        "replace_remote": "Zamien na lokalny",
+        "replace_remote": "Zamien wybrany nizej *.pub",
+        "upload_selected_pub_btn": "Wgraj wybrany klucz publiczny",
+        "browse_pub_key": "Wybierz klucz lokalny *.pub",
+        "pub_key_path_placeholder": "Sciezka do klucza publicznego (*.pub)",
         "status_ready": "Gotowe",
         "minimize": "Minimalizuj",
         "maximize": "Powieksz",
@@ -272,11 +283,16 @@ TRANSLATIONS = {
         "agent_none_selected": "Zaznacz co najmniej jeden klucz.",
         "remote_keys_loaded": "Zaladowano klucze zdalne: {count}",
         "remote_keys_removed": "Usunieto wybrane klucze zdalne.",
-        "remote_keys_replaced": "Zamieniono klucze na lokalny klucz.",
+        "remote_keys_replaced": "Zamieniono klucze na wybrany plik .pub.",
         "remote_keys_none": "Brak zaznaczonych kluczy zdalnych.",
         "remote_keys_empty": "Brak kluczy na zdalnym urzadzeniu.",
+        "pub_select_missing": "Wybierz plik klucza publicznego (*.pub).",
+        "pub_select_empty": "Wybrany plik klucza publicznego jest pusty.",
+        "pub_select_uploaded": "Wybrany klucz publiczny zostal wgrany na urzadzenie.",
+        "pub_select_exists": "Wybrany klucz publiczny juz znajduje sie w authorized_keys.",
         "file_dialog_title": "Zapisz klucz",
         "file_dialog_key": "Wybierz klucz prywatny",
+        "file_dialog_pub": "Wybierz klucz publiczny",
         "agent_key_passphrase_label": "Haslo do klucza (agent)",
         "agent_key_passphrase_placeholder": "Haslo do klucza dodawanego do agenta",
         "agent_key_passphrase_required": "Klucz wymaga hasla, podaj je przed dodaniem.",
@@ -374,11 +390,27 @@ def short_key_label(line: str) -> str:
     suffix = parts[1][-10:] if len(parts) > 1 else ""
     label = f"{key_type} {comment}".strip()
     if suffix:
-        label = f"{label} â€¦{suffix}".strip()
+        label = f"{label} ...{suffix}".strip()
     return label
 
 
 class TitleBar(QWidget):
+    def _make_title_icon(self, kind: str) -> QIcon:
+        pix = QPixmap(14, 14)
+        pix.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(pix)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pen = QPen(QColor(235, 240, 255), 2)
+        painter.setPen(pen)
+        if kind == "min":
+            painter.drawLine(2, 10, 12, 10)
+        elif kind == "max":
+            painter.drawRect(2, 2, 10, 10)
+        else:
+            painter.drawRect(4, 2, 8, 8)
+            painter.drawRect(2, 4, 8, 8)
+        painter.end()
+        return QIcon(pix)
     def __init__(self, parent):
         super().__init__(parent)
         self._parent = parent
@@ -394,14 +426,21 @@ class TitleBar(QWidget):
         self.title.setStyleSheet("color: rgb(230,234,255); font-size: 18px; font-weight: 700;")
         layout.addWidget(self.title, 1)
 
-        self.btn_min = QPushButton("-")
-        self.btn_max = QPushButton("▢")
+        self.btn_min = QPushButton()
+        self.btn_max = QPushButton()
         self.btn_close = QPushButton("x")
 
         self.btn_min.setObjectName("title_min")
         self.btn_max.setObjectName("title_max")
         self.btn_close.setObjectName("title_close")
+        self.icon_min = self._make_title_icon("min")
+        self.icon_max = self._make_title_icon("max")
+        self.icon_restore = self._make_title_icon("restore")
 
+        self.btn_min.setIcon(self.icon_min)
+        self.btn_max.setIcon(self.icon_max)
+        self.btn_min.setIconSize(QSize(12, 12))
+        self.btn_max.setIconSize(QSize(12, 12))
         icon_font = QFont()
         icon_font.setPointSize(11)
         icon_font.setBold(True)
@@ -590,7 +629,7 @@ class InstructionDialog(QDialog):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setModal(True)
-        self.setFixedSize(720, 560)
+
         if parent is not None:
             self.setStyleSheet(parent.styleSheet())
 
@@ -625,9 +664,14 @@ class InstructionDialog(QDialog):
         body.setText(f"<div style='text-align: justify'>{body_html}</div>")
         body.setAlignment(Qt.AlignmentFlag.AlignTop)
         body.setStyleSheet("color: rgb(210,220,255); font-size: 11px; line-height: 1.35;")
-        content_layout.addWidget(body)
-        content_layout.addStretch(1)
+        target_width = 640
+        body.setFixedWidth(target_width - 80)
+        body.adjustSize()
+        content_height = body.sizeHint().height()
+        target_height = min(760, max(420, content_height + 120))
+        self.setFixedSize(target_width, target_height)
 
+        content_layout.addWidget(body)
         scroll.setWidget(content)
         layout.addWidget(scroll, 1)
 
@@ -785,6 +829,13 @@ class MainWindow(QWidget):
         self.remote_keys_list = QListWidget()
         self.remote_keys_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.remote_keys_list.setFixedHeight(120)
+        self.remote_pub_key_path = QLineEdit()
+        self.btn_remote_pub_browse = QPushButton()
+        self.btn_remote_pub_browse.setObjectName("actionButton")
+        self.btn_remote_pub_browse.clicked.connect(self.pick_remote_pub_key)
+        self.btn_upload_pub_key = QPushButton()
+        self.btn_upload_pub_key.setObjectName("actionButton")
+        self.btn_upload_pub_key.clicked.connect(self.upload_selected_pub_key)
         self.btn_detect_remote = QPushButton()
         self.btn_detect_remote.setObjectName("actionButton")
         self.btn_remove_remote = QPushButton()
@@ -853,6 +904,8 @@ class MainWindow(QWidget):
             self.btn_detect_remote,
             self.btn_remove_remote,
             self.btn_replace_remote,
+            self.btn_upload_pub_key,
+            self.btn_remote_pub_browse,
             self.terminal_send,
         ):
             self._apply_action_button_style(btn)
@@ -915,6 +968,13 @@ class MainWindow(QWidget):
         content_layout.addWidget(self.remote_keys_list)
         content_layout.addLayout(self._row_three_buttons(self.btn_detect_remote, self.btn_remove_remote, self.btn_replace_remote))
 
+        row_pub_upload = QHBoxLayout()
+        row_pub_upload.setSpacing(10)
+        row_pub_upload.addWidget(self.btn_upload_pub_key)
+        row_pub_upload.addWidget(self.remote_pub_key_path, 1)
+        row_pub_upload.addWidget(self.btn_remote_pub_browse)
+        content_layout.addLayout(row_pub_upload)
+
         layout.addWidget(self.terminal_panel)
         layout.addWidget(self.status, 0, Qt.AlignmentFlag.AlignHCenter)
 
@@ -960,6 +1020,7 @@ class MainWindow(QWidget):
         self.auth_method.setCurrentIndex(int(self.settings.value("auth_method", 0)))
         self.auth_key_path.setText(self.settings.value("auth_key_path", ""))
         self.agent_key_path.setText(self.settings.value("agent_key_path", ""))
+        self.remote_pub_key_path.setText(self.settings.value("remote_pub_key_path", ""))
 
     def save_settings(self):
         self.settings.setValue("language", self.lang)
@@ -975,6 +1036,7 @@ class MainWindow(QWidget):
         self.settings.setValue("auth_method", self.auth_method.currentIndex())
         self.settings.setValue("auth_key_path", self.auth_key_path.text())
         self.settings.setValue("agent_key_path", self.agent_key_path.text())
+        self.settings.setValue("remote_pub_key_path", self.remote_pub_key_path.text())
 
     def closeEvent(self, event):
         self.save_settings()
@@ -1036,6 +1098,9 @@ class MainWindow(QWidget):
         self.btn_detect_remote.setText(self.tr("detect_remote"))
         self.btn_remove_remote.setText(self.tr("remove_remote"))
         self.btn_replace_remote.setText(self.tr("replace_remote"))
+        self.btn_upload_pub_key.setText(self.tr("upload_selected_pub_btn"))
+        self.btn_remote_pub_browse.setText(self.tr("browse_pub_key"))
+        self.remote_pub_key_path.setPlaceholderText(self.tr("pub_key_path_placeholder"))
 
         self.auth_method.blockSignals(True)
         self.auth_method.clear()
@@ -1737,7 +1802,12 @@ class MainWindow(QWidget):
             return None
 
         pkey = None
-        for cls in (paramiko.Ed25519Key, paramiko.ECDSAKey, paramiko.RSAKey, paramiko.DSSKey):
+        key_classes = []
+        for name in ("Ed25519Key", "ECDSAKey", "RSAKey", "DSSKey"):
+            cls = getattr(paramiko, name, None)
+            if cls is not None:
+                key_classes.append(cls)
+        for cls in key_classes:
             try:
                 pkey = cls.from_private_key_file(key_path, password=passphrase or None)
                 if pkey:
@@ -1811,17 +1881,7 @@ class MainWindow(QWidget):
         self.set_status(self.tr("auth_required"), ERROR)
         return None
 
-    def upload_key(self):
-        pub_path = Path(self.path_edit.text().strip() + ".pub")
-        if not pub_path.exists():
-            self.set_status(self.tr("pub_missing"), ERROR)
-            return
-
-        pub_key = pub_path.read_text(encoding="utf-8").strip()
-        if not pub_key:
-            self.set_status(self.tr("pub_empty"), ERROR)
-            return
-
+    def _upload_public_key_to_remote(self, pub_key: str, ok_key: str, exists_key: str):
         client = self.connect_client()
         if not client:
             return
@@ -1839,19 +1899,59 @@ class MainWindow(QWidget):
                 existing = ""
 
             if pub_key in existing:
-                self.set_status(self.tr("upload_exists"), MUTED)
+                self.set_status(self.tr(exists_key), MUTED)
             else:
                 with sftp.open(auth_path, "a") as f:
                     if existing and not existing.endswith("\n"):
                         f.write("\n")
                     f.write(pub_key + "\n")
                 client.exec_command("chmod 600 ~/.ssh/authorized_keys")
-                self.set_status(self.tr("upload_ok"), SUCCESS)
+                self.set_status(self.tr(ok_key), SUCCESS)
 
             sftp.close()
             client.close()
         except Exception as exc:
             self.set_status(self.tr("ssh_error", err=exc), ERROR)
+
+    def upload_key(self):
+        pub_path = Path(self.path_edit.text().strip() + ".pub")
+        if not pub_path.exists():
+            self.set_status(self.tr("pub_missing"), ERROR)
+            return
+
+        pub_key = pub_path.read_text(encoding="utf-8").strip()
+        if not pub_key:
+            self.set_status(self.tr("pub_empty"), ERROR)
+            return
+
+        self._upload_public_key_to_remote(pub_key, "upload_ok", "upload_exists")
+    def pick_remote_pub_key(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            self.tr("file_dialog_pub"),
+            str(Path.home()),
+            "Public key (*.pub)",
+        )
+        if path:
+            self.remote_pub_key_path.setText(path)
+
+    def upload_selected_pub_key(self):
+        raw_path = self.remote_pub_key_path.text().strip()
+        if not raw_path:
+            self.set_status(self.tr("pub_select_missing"), ERROR)
+            return
+
+        pub_path = Path(raw_path).expanduser()
+        if not pub_path.is_file():
+            self.set_status(self.tr("pub_select_missing"), ERROR)
+            return
+
+        pub_key = pub_path.read_text(encoding="utf-8").strip()
+        if not pub_key:
+            self.set_status(self.tr("pub_select_empty"), ERROR)
+            return
+
+        self._upload_public_key_to_remote(pub_key, "pub_select_uploaded", "pub_select_exists")
 
     def open_remote_terminal(self):
         host = self.host.text().strip()
@@ -1948,13 +2048,19 @@ class MainWindow(QWidget):
             self.set_status(self.tr("ssh_error", err=exc), ERROR)
 
     def replace_remote_keys(self):
-        pub_path = Path(self.path_edit.text().strip() + ".pub")
-        if not pub_path.exists():
-            self.set_status(self.tr("pub_missing"), ERROR)
+        raw_path = self.remote_pub_key_path.text().strip()
+        if not raw_path:
+            self.set_status(self.tr("pub_select_missing"), ERROR)
             return
+
+        pub_path = Path(raw_path).expanduser()
+        if not pub_path.is_file():
+            self.set_status(self.tr("pub_select_missing"), ERROR)
+            return
+
         pub_key = pub_path.read_text(encoding="utf-8").strip()
         if not pub_key:
-            self.set_status(self.tr("pub_empty"), ERROR)
+            self.set_status(self.tr("pub_select_empty"), ERROR)
             return
 
         selected = [item.data(Qt.ItemDataRole.UserRole) for item in self.remote_keys_list.selectedItems()]
@@ -2044,6 +2150,7 @@ class MainWindow(QWidget):
             self.path_edit,
             self.auth_key_path,
             self.auth_key_passphrase,
+            self.remote_pub_key_path,
             self.host,
             self.username,
             self.password,
@@ -2099,15 +2206,14 @@ class MainWindow(QWidget):
             self.setFixedSize(MAX_SIZE, MAX_SIZE)
             self._is_maximized = True
             self._drag_active = False
-            self.titlebar.btn_max.setText("▣")
+            self.titlebar.btn_max.setIcon(self.titlebar.icon_restore)
             self.titlebar.set_maximize_tooltip(self.tr("restore"))
         else:
             self.setFixedSize(self._base_size, self._base_size)
             self._is_maximized = False
             self._drag_active = False
-            self.titlebar.btn_max.setText("▢")
+            self.titlebar.btn_max.setIcon(self.titlebar.icon_max)
             self.titlebar.set_maximize_tooltip(self.tr("maximize"))
-
 
 def main():
     if "QT_LOGGING_RULES" not in os.environ:
@@ -2121,6 +2227,28 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
