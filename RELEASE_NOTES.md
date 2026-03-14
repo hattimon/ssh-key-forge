@@ -1,4 +1,4 @@
-﻿# Release Notes
+# Release Notes
 
 ## English
 Version v1.1.1 includes:
@@ -9,6 +9,11 @@ Version v1.1.1 includes:
 - White titlebar icons (min/max/restore) with proper minimize line
 - Instruction dialog height tuned (no scrollbar, less empty space)
 - Removed redundant local-key upload button
+
+Files (SHA256):
+- SSHKeyForge.exe - SHA256: 8E1E63BF7C24351E79F70944CCE3C96D11CA1BA5802548325FBDD5A4B4DBA221 (53.1 MB)
+- SSHKeyForge-Setup.exe - SHA256: 0FB5CB88F49A3256B13D254C588EECF017267C94F79A94AD156670C9C8D18623 (52.92 MB)
+- SSHKeyForge_v1.1.1_win64.zip - SHA256: 24CC38CAE693434C2FBDB407F217DF1DFB815A1213C5B0F46688D4EC986C1299 (52.78 MB)
 
 Version v1.0.1 includes:
 - New ssh-agent key management section (list, remove selected, clear agent)
@@ -33,6 +38,11 @@ Wersja v1.1.1 zawiera:
 - Okno instrukcji dopasowane: bez scrolla i bez nadmiaru pustego miejsca
 - Usuniety zbedny przycisk wgrywania lokalnego klucza
 
+Pliki (SHA256):
+- SSHKeyForge.exe - SHA256: 8E1E63BF7C24351E79F70944CCE3C96D11CA1BA5802548325FBDD5A4B4DBA221 (53.1 MB)
+- SSHKeyForge-Setup.exe - SHA256: 0FB5CB88F49A3256B13D254C588EECF017267C94F79A94AD156670C9C8D18623 (52.92 MB)
+- SSHKeyForge_v1.1.1_win64.zip - SHA256: 24CC38CAE693434C2FBDB407F217DF1DFB815A1213C5B0F46688D4EC986C1299 (52.78 MB)
+
 Wersja v1.0.1 zawiera:
 - Nowa sekcja zarzadzania kluczami w ssh-agent (lista, usun zaznaczone, wyczysc agenta)
 - Ostrzezenie przy kluczach agenta o duplikatach powodujacych problemy z polaczeniem
@@ -45,6 +55,7 @@ Wersja v1.0.0 zawiera:
 - Zarzadzanie authorized_keys na zdalnym hoscie (wykrywanie, usuwanie, zamiana)
 - Interfejs po angielsku i po polsku
 - Zaktualizowany README ze screenami
+
 
 
 
