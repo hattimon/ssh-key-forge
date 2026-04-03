@@ -4,6 +4,7 @@ import os
 import subprocess
 import math
 import tempfile
+import shutil
 from pathlib import Path
 
 from PyQt6.QtCore import Qt, QRect, QUrl, QRectF, QSettings, QProcess, QProcessEnvironment, QTimer, QSize
@@ -190,6 +191,14 @@ TRANSLATIONS = {
         "agent_keys_cleared": "All agent keys removed.",
         "agent_keys_remove_failed": "Failed to remove key: {err}",
         "agent_keys_clear_failed": "Failed to clear ssh-agent: {err}",
+        "deps_missing_title": "Missing dependencies",
+        "deps_missing_body": "Required components are missing: {items}.\nInstall now?",
+        "deps_install_bg_started": "Dependency installation started in the background (admin prompt may appear).",
+        "deps_install_failed": "Failed to start dependency installer: {err}",
+        "deps_missing_later": "Required dependencies are missing. Some features will not work until installed.",
+        "deps_checking": "Checking required dependencies...",
+        "deps_paramiko_body": "Python package 'paramiko' is missing.\nInstall it now?",
+        "deps_paramiko_started": "Paramiko installation started in the background.",
     },
     "PL": {
         "app_title": "SSH Key Forge",
@@ -311,6 +320,14 @@ TRANSLATIONS = {
         "agent_keys_cleared": "Wyczyszczono wszystkie klucze agenta.",
         "agent_keys_remove_failed": "Nie udalo sie usunac klucza: {err}",
         "agent_keys_clear_failed": "Nie udalo sie wyczyscic ssh-agent: {err}",
+        "deps_missing_title": "Brakujace zaleznosci",
+        "deps_missing_body": "Brakuje wymaganych skladnikow: {items}.\nZainstalowac teraz?",
+        "deps_install_bg_started": "Instalacja zaleznosci uruchomiona w tle (moze pojawic sie okno admina).",
+        "deps_install_failed": "Nie udalo sie uruchomic instalatora zaleznosci: {err}",
+        "deps_missing_later": "Brakuja wymagane zaleznosci. Czesci funkcji beda niedostepne do czasu instalacji.",
+        "deps_checking": "Sprawdzanie wymaganych zaleznosci...",
+        "deps_paramiko_body": "Brak pakietu Python 'paramiko'.\nZainstalowac teraz?",
+        "deps_paramiko_started": "Instalacja paramiko uruchomiona w tle.",
     },
 }
 
@@ -994,6 +1011,7 @@ class MainWindow(QWidget):
         self.update_auth_ui()
         self.init_music()
         self.init_pulse()
+        QTimer.singleShot(700, self.bootstrap_runtime_dependencies)
 
     def tr(self, key: str, **kwargs) -> str:
         text = TRANSLATIONS.get(self.lang, TRANSLATIONS["EN"]).get(key, key)
@@ -1503,6 +1521,71 @@ class MainWindow(QWidget):
             self.set_status(self.tr("agent_started"), MUTED)
             return True
         return False
+
+    def _has_command(self, name: str) -> bool:
+        return shutil.which(name) is not None
+
+    def _install_openssh_background(self):
+        if os.name != "nt":
+            return
+        try:
+            cmd = (
+                "Start-Process PowerShell -Verb RunAs -ArgumentList "
+                "'-NoProfile -ExecutionPolicy Bypass -Command "
+                "\"Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0 | Out-Null; "
+                "Set-Service ssh-agent -StartupType Automatic; "
+                "Start-Service ssh-agent -ErrorAction SilentlyContinue\"'"
+            )
+            subprocess.Popen(["powershell", "-NoProfile", "-Command", cmd])
+            self.set_status(self.tr("deps_install_bg_started"), MUTED)
+        except Exception as exc:
+            self.set_status(self.tr("deps_install_failed", err=exc), ERROR)
+
+    def _install_paramiko_background(self):
+        try:
+            kwargs = {}
+            if os.name == "nt":
+                kwargs["creationflags"] = 0x08000000
+            subprocess.Popen([sys.executable, "-m", "pip", "install", "paramiko"], **kwargs)
+            self.set_status(self.tr("deps_paramiko_started"), MUTED)
+        except Exception as exc:
+            self.set_status(self.tr("deps_install_failed", err=exc), ERROR)
+
+    def bootstrap_runtime_dependencies(self):
+        self.set_status(self.tr("deps_checking"), MUTED)
+        if os.name == "nt":
+            missing = []
+            if not self._has_command("ssh-keygen"):
+                missing.append("OpenSSH Client (ssh-keygen)")
+            if not self._has_command("ssh-add"):
+                missing.append("OpenSSH Client (ssh-add)")
+            if missing:
+                text = self.tr("deps_missing_body", items=", ".join(sorted(set(missing))))
+                answer = QMessageBox.question(
+                    self,
+                    self.tr("deps_missing_title"),
+                    text,
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.Yes,
+                )
+                if answer == QMessageBox.StandardButton.Yes:
+                    self._install_openssh_background()
+                else:
+                    self.set_status(self.tr("deps_missing_later"), ERROR)
+
+        if not getattr(sys, "frozen", False):
+            try:
+                import paramiko  # noqa: F401
+            except Exception:
+                answer = QMessageBox.question(
+                    self,
+                    self.tr("deps_missing_title"),
+                    self.tr("deps_paramiko_body"),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.Yes,
+                )
+                if answer == QMessageBox.StandardButton.Yes:
+                    self._install_paramiko_background()
 
     def _start_process(self, program: str, args: list, purpose: str, env=None) -> bool:
         if self.proc and self.proc.state() == QProcess.ProcessState.Running:

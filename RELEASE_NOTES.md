@@ -1,6 +1,18 @@
 # Release Notes
 
 ## English
+Version v1.1.2 includes:
+- Startup dependency bootstrap for required tools
+- Automatic check for OpenSSH Client (ssh-keygen, ssh-add) on app launch
+- Prompted background installation of OpenSSH Client from the app when missing
+- Installer check for OpenSSH Client with optional automatic install during setup
+- Optional auto-install prompt for missing `paramiko` when running from Python source
+
+Files (SHA256):
+- SSHKeyForge.exe - SHA256: AB1E00BE5ED0BFD3C13CB463C9C82C825397D6EB83330931A5BE8DA2C2B27199 (53.11 MB)
+- SSHKeyForge-Setup.exe - SHA256: 5FA452313DEF908E2EB26C97B1CC731CC130FA15BE0E17FF9E7BD2B5AC867F36 (52.93 MB)
+- SSHKeyForge_v1.1.2_win64.zip - SHA256: 22A8C59F4538B394A0646CFE27203FA53A2158BE7138FC8CA74E1FB8D0ACC8CC (52.78 MB)
+
 Version v1.1.1 includes:
 - Instruction content expanded and clarified
 - More descriptive, intuitive button labels
@@ -29,6 +41,18 @@ Version v1.0.0 includes:
 - Updated README with screenshots
 
 ## Polski
+Wersja v1.1.2 zawiera:
+- Startowy mechanizm sprawdzania wymaganych zaleznosci
+- Automatyczne sprawdzanie OpenSSH Client (ssh-keygen, ssh-add) przy uruchomieniu aplikacji
+- Propozycje instalacji OpenSSH Client z poziomu aplikacji (w tle, z uprawnieniami admina)
+- Sprawdzanie OpenSSH Client w instalatorze i opcjonalna automatyczna instalacja podczas setupu
+- Opcjonalna propozycja instalacji brakujacego `paramiko` przy uruchamianiu ze zrodla Python
+
+Pliki (SHA256):
+- SSHKeyForge.exe - SHA256: AB1E00BE5ED0BFD3C13CB463C9C82C825397D6EB83330931A5BE8DA2C2B27199 (53.11 MB)
+- SSHKeyForge-Setup.exe - SHA256: 5FA452313DEF908E2EB26C97B1CC731CC130FA15BE0E17FF9E7BD2B5AC867F36 (52.93 MB)
+- SSHKeyForge_v1.1.2_win64.zip - SHA256: 22A8C59F4538B394A0646CFE27203FA53A2158BE7138FC8CA74E1FB8D0ACC8CC (52.78 MB)
+
 Wersja v1.1.1 zawiera:
 - Uzupelniona i doprecyzowana instrukcja
 - Bardziej opisowe i intuicyjne etykiety przyciskow
